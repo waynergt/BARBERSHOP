@@ -1,73 +1,57 @@
-# React + TypeScript + Vite
+# 💈 JBarber - Sistema de Reservas para Barbería
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+![Firebase](https://img.shields.io/badge/Firebase-039BE5?style=for-the-badge&logo=Firebase&logoColor=white)
+![Tailwind
+CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
 
-Currently, two official plugins are available:
+Aplicación Web **Full Stack** para la gestión automatizada de citas de
+una barbería.\
+Permite a los clientes reservar citas en tiempo real y ofrece un panel
+administrativo seguro para la gestión del negocio.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+🔗 **Demo en vivo:**\
+👉 https://jbarber-c136e.web.app
 
-## React Compiler
+## 📸 Capturas de Pantalla
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+  -------------------------------------------------------------------------
+            Vista del Cliente                 Panel de Administración
+  ------------------------------------- -----------------------------------
+                 ![Vista                              ![Panel
+   Cliente](./screenshots/cliente.png)    Admin](./screenshots/admin.png)
 
-## Expanding the ESLint configuration
+  -------------------------------------------------------------------------
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 🚀 Características Principales
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### 👤 Para el Cliente
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+-   Reservas en tiempo real
+-   UX móvil optimizada
+-   Notificaciones modernas
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### 🛡️ Panel de Administración
+
+-   Rutas protegidas
+-   Soft delete de citas
+-   Gestión visual clara
+
+## 🛠️ Tecnologías Utilizadas
+
+-   React + TypeScript
+-   Tailwind CSS
+-   Firebase Firestore
+-   Firebase Hosting
+
+## 📦 Instalación
+
+``` bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 👨‍💻 Autor
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+Desarrollado por **Wayner López**
