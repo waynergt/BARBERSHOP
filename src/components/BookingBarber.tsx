@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { crearCita, obtenerHorariosOcupados } from '../services/citas'; 
 import { toast } from 'sonner';
 
-// Asegúrate de que la ruta sea correcta
+// Asegúrate de que la ruta del logo sea correcta
 import logoImg from '../assets/logo.png'; 
 
 export default function BookingBarber() {
@@ -75,13 +75,12 @@ export default function BookingBarber() {
         <img 
           src={logoImg} 
           alt="Logo JBarber Shop" 
-          // CAMBIO AQUÍ: w-32 md:w-40 (más pequeño)
           className="w-32 md:w-40 mb-4 object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]" 
         />
         <p className="text-zinc-500 uppercase text-xs tracking-[0.2em]">Reserva tu estilo</p>
       </div>
 
-      <div className="max-w-md w-full bg-zinc-900 p-5 rounded-xl border border-zinc-800 shadow-2xl">
+      <div className="max-w-md w-full bg-zinc-900 p-5 rounded-xl border border-zinc-800 shadow-2xl mb-10">
         
         <div className="mb-6">
           <label className="block text-xs font-bold text-zinc-500 uppercase mb-2">Selecciona una fecha</label>
@@ -176,8 +175,54 @@ export default function BookingBarber() {
 
       </div>
       
+      {/* --- SECCIÓN REDES SOCIALES --- */}
+      <div className="w-full max-w-xs flex flex-col items-center mb-8">
+        
+        {/* LETRERO DECORATIVO */}
+        <div className="flex items-center w-full gap-4 mb-5 opacity-70">
+           <div className="h-px bg-zinc-700 flex-1"></div>
+           <span className="text-xs text-zinc-400 font-bold tracking-[0.2em] uppercase whitespace-nowrap">Síguenos</span>
+           <div className="h-px bg-zinc-700 flex-1"></div>
+        </div>
+
+        <div className="flex gap-8">
+          {/* Facebook */}
+          <a 
+            href="https://www.facebook.com/share/1C43CofA7q/?mibextid=wwXIfr" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-zinc-500 hover:text-blue-500 transition-colors transform hover:scale-110 duration-200"
+            aria-label="Facebook"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+          </a>
+
+          {/* Instagram */}
+          <a 
+            href="https://www.instagram.com/josue_del_cid_?igsh=MW91Y2V6bzYzbDJ6OQ%3D%3D&utm_source=qr" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-zinc-500 hover:text-pink-500 transition-colors transform hover:scale-110 duration-200"
+            aria-label="Instagram"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
+          </a>
+
+          {/* TikTok */}
+          <a 
+            href="https://www.tiktok.com/@josue_barber_502" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-zinc-500 hover:text-white transition-colors transform hover:scale-110 duration-200"
+            aria-label="TikTok"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg>
+          </a>
+        </div>
+      </div>
+
       {/* PIE DE PÁGINA */}
-      <p className="mt-8 text-xs text-zinc-600 mb-10 text-center leading-relaxed">
+      <p className="text-xs text-zinc-600 mb-10 text-center leading-relaxed">
         Horario de Almuerzo: 1:00 PM - 2:00 PM
         <br/>
         <span className="opacity-50">Última cita: 11:30 PM, Cerramos a medianoche.</span>
