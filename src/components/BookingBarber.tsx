@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import { crearCita, obtenerHorariosOcupados } from '../services/citas'; 
 import { toast } from 'sonner';
 
+// Asegúrate de que la ruta sea correcta
+import logoImg from '../assets/logo.png'; 
+
 export default function BookingBarber() {
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [reservedSlots, setReservedSlots] = useState<string[]>([]);
@@ -12,8 +15,19 @@ export default function BookingBarber() {
   const [submitting, setSubmitting] = useState(false);
 
   // --- HORARIOS ---
-  const morningSlots = ['09:00', '09:45', '10:30', '11:15'];
-  const afternoonSlots = ['13:15', '14:00', '14:45', '15:30', '16:15', '17:00', '17:45', '18:30', '19:15', '20:00'];
+  const morningSlots = [
+    '09:00 AM', '09:30 AM', '10:00 AM', '10:30 AM', 
+    '11:00 AM', '11:30 AM', '12:00 PM', '12:30 PM'
+  ];
+
+  const afternoonSlots = [
+    '02:00 PM', '02:30 PM', '03:00 PM', '03:30 PM', 
+    '04:00 PM', '04:30 PM', '05:00 PM', '05:30 PM', 
+    '06:00 PM', '06:30 PM', '07:00 PM', '07:30 PM', 
+    '08:00 PM', '08:30 PM', '09:00 PM', '09:30 PM', 
+    '10:00 PM', '10:30 PM', '11:00 PM', '11:30 PM'
+  ];
+
   const allTimes = [...morningSlots, ...afternoonSlots];
 
   useEffect(() => {
@@ -54,11 +68,16 @@ export default function BookingBarber() {
   };
 
   return (
-    // CAMBIO 1: min-h-dvh para que la barra del navegador no tape nada
     <div className="min-h-dvh bg-zinc-950 text-gray-200 flex flex-col items-center py-8 px-4 font-sans">
       
-      <div className="max-w-md w-full mb-6 text-center">
-        <h1 className="text-3xl font-bold tracking-tight text-white mb-2">JBARBER SHOP</h1>
+      {/* SECCIÓN DEL LOGO */}
+      <div className="max-w-md w-full mb-8 text-center flex flex-col items-center">
+        <img 
+          src={logoImg} 
+          alt="Logo JBarber Shop" 
+          // CAMBIO AQUÍ: w-32 md:w-40 (más pequeño)
+          className="w-32 md:w-40 mb-4 object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]" 
+        />
         <p className="text-zinc-500 uppercase text-xs tracking-[0.2em]">Reserva tu estilo</p>
       </div>
 
@@ -70,8 +89,6 @@ export default function BookingBarber() {
             type="date" 
             value={date}
             onChange={(e) => { setDate(e.target.value); setSelectedSlot(null); }}
-            // CAMBIO 2: text-base en móviles evita el zoom automático en iPhone
-            // touch-manipulation mejora la respuesta al dedo
             className="w-full bg-zinc-950 border border-zinc-700 text-white rounded-lg p-3 outline-none focus:border-red-700 transition-colors text-base appearance-none"
           />
         </div>
@@ -81,7 +98,6 @@ export default function BookingBarber() {
           {loading && <span className="text-xs text-zinc-500 animate-pulse">Cargando...</span>}
         </div>
 
-        {/* CAMBIO 3: Grid de 3 columnas es perfecto para pulgares. touch-manipulation añadido */}
         <div className="grid grid-cols-3 gap-3 mb-8">
           {allTimes.map((time) => {
             const isReserved = reservedSlots.includes(time);
@@ -98,7 +114,7 @@ export default function BookingBarber() {
                     ? 'bg-zinc-950/50 text-zinc-700 border-transparent cursor-not-allowed decoration-zinc-800' 
                     : isSelected
                       ? 'bg-red-700 text-white border-red-700 shadow-[0_0_15px_rgba(185,28,28,0.4)] scale-105 z-10'
-                      : 'bg-zinc-800 text-gray-300 border-zinc-700 active:scale-95' // Efecto al presionar con el dedo
+                      : 'bg-zinc-800 text-gray-300 border-zinc-700 active:scale-95'
                   }
                 `}
               >
@@ -124,7 +140,6 @@ export default function BookingBarber() {
                 required
                 value={name}
                 onChange={e => setName(e.target.value)}
-                // CAMBIO 4: text-base para evitar zoom
                 className="w-full bg-zinc-900 border border-zinc-700 text-white rounded p-3 text-base focus:border-red-700 outline-none"
               />
               
@@ -134,7 +149,6 @@ export default function BookingBarber() {
                 required
                 value={phone}
                 onChange={e => setPhone(e.target.value)}
-                // CAMBIO 4: text-base para evitar zoom
                 className="w-full bg-zinc-900 border border-zinc-700 text-white rounded p-3 text-base focus:border-red-700 outline-none"
               />
             </div>
@@ -142,7 +156,6 @@ export default function BookingBarber() {
             <button 
               type="submit"
               disabled={submitting}
-              // CAMBIO 5: active:scale-95 da sensación táctil al presionar
               className={`
                 w-full py-4 rounded-lg font-bold tracking-wide uppercase transition-all touch-manipulation active:scale-95
                 ${submitting 
@@ -163,8 +176,11 @@ export default function BookingBarber() {
 
       </div>
       
-      <p className="mt-8 text-xs text-zinc-600 mb-10">
-        Almuerzo: 12:30 PM - 1:10 PM
+      {/* PIE DE PÁGINA */}
+      <p className="mt-8 text-xs text-zinc-600 mb-10 text-center leading-relaxed">
+        Horario de Almuerzo: 1:00 PM - 2:00 PM
+        <br/>
+        <span className="opacity-50">Última cita: 11:30 PM, Cerramos a medianoche.</span>
       </p>
     </div>
   );
