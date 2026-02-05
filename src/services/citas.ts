@@ -1,4 +1,3 @@
-// src/services/citas.ts
 import { db } from "../firebase/config";
 import { 
   collection, 
@@ -10,7 +9,7 @@ import {
   orderBy,
   deleteDoc,
   doc,
-  updateDoc // <--- NUEVO IMPORT
+  updateDoc 
 } from "firebase/firestore";
 
 export interface Cita {
@@ -19,12 +18,13 @@ export interface Cita {
   fecha: string; 
   hora: string;  
   telefono?: string;
-  estado?: 'confirmada' | 'cancelada'; // <--- NUEVO CAMPO
+  estado?: 'confirmada' | 'cancelada';
+  motivoCancelacion?: string; // <--- NUEVO CAMPO
 }
 
 const COLLECTION_NAME = "citas";
 
-// 1. Guardar nueva cita (Igual que antes)
+// 1. Guardar nueva cita
 export const crearCita = async (cita: Cita) => {
   try {
     const ocupado = await verificarDisponibilidad(cita.fecha, cita.hora);
@@ -32,7 +32,7 @@ export const crearCita = async (cita: Cita) => {
 
     const docRef = await addDoc(collection(db, COLLECTION_NAME), {
       ...cita,
-      estado: 'confirmada', // <--- Por defecto nace confirmada
+      estado: 'confirmada', 
       creadoEn: serverTimestamp()
     });
     return docRef.id;
@@ -42,7 +42,7 @@ export const crearCita = async (cita: Cita) => {
   }
 };
 
-// 2. Obtener horarios ocupados (MODIFICADO para liberar canceladas)
+// 2. Obtener horarios ocupados
 export const obtenerHorariosOcupados = async (fecha: string): Promise<string[]> => {
   const q = query(
     collection(db, COLLECTION_NAME), 
@@ -51,16 +51,15 @@ export const obtenerHorariosOcupados = async (fecha: string): Promise<string[]> 
   
   const querySnapshot = await getDocs(q);
   
-  // Filtramos: Solo devolvemos la hora si NO está cancelada
   const horariosOcupados = querySnapshot.docs
     .map(doc => doc.data() as Cita)
-    .filter(cita => cita.estado !== 'cancelada') // <--- AQUÍ ESTÁ LA MAGIA
+    .filter(cita => cita.estado !== 'cancelada') 
     .map(cita => cita.hora);
 
   return horariosOcupados;
 };
 
-// 3. Verificar disponibilidad (MODIFICADO)
+// 3. Verificar disponibilidad
 const verificarDisponibilidad = async (fecha: string, hora: string): Promise<boolean> => {
   const q = query(
     collection(db, COLLECTION_NAME),
@@ -69,14 +68,13 @@ const verificarDisponibilidad = async (fecha: string, hora: string): Promise<boo
   );
   const snapshot = await getDocs(q);
   
-  // Si encontramos citas, verificamos si alguna está activa
   const citasEnEsaHora = snapshot.docs.map(doc => doc.data() as Cita);
   const hayCitaActiva = citasEnEsaHora.some(cita => cita.estado !== 'cancelada');
   
   return hayCitaActiva;
 };
 
-// 4. Ver TODAS las reservas (MODIFICADO para traer el estado)
+// 4. Ver TODAS las reservas
 export const obtenerTodasLasCitas = async (): Promise<Cita[]> => {
   const q = query(
     collection(db, COLLECTION_NAME),
@@ -91,13 +89,14 @@ export const obtenerTodasLasCitas = async (): Promise<Cita[]> => {
   } as Cita));
 };
 
-// 5. NUEVA FUNCIÓN: Cancelar en lugar de eliminar
-export const cancelarCita = async (id: string) => {
+// 5. Cancelar cita con motivo
+export const cancelarCita = async (id: string, motivo?: string) => {
   try {
     const docRef = doc(db, COLLECTION_NAME, id);
-    // En lugar de borrar, actualizamos el estado
+    // Actualizamos estado y motivo
     await updateDoc(docRef, {
-      estado: 'cancelada'
+      estado: 'cancelada',
+      motivoCancelacion: motivo || "Sin motivo especificado"
     });
   } catch (error) {
     console.error("Error cancelando:", error);
@@ -105,7 +104,7 @@ export const cancelarCita = async (id: string) => {
   }
 };
 
-// (Opcional) Dejamos la de eliminar por si acaso quieres borrar basura
+// (Opcional) Eliminar definitivamente
 export const eliminarCita = async (id: string) => {
   const docRef = doc(db, COLLECTION_NAME, id);
   await deleteDoc(docRef);
