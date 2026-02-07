@@ -5,9 +5,11 @@ import { toast } from 'sonner';
 // Asegúrate de que la ruta del logo sea correcta
 import logoImg from '../assets/logo.png'; 
 
-// URL de la imagen de fondo (Puedes cambiarla por una tuya si la subes a assets)
+// URL de la imagen de fondo
 const BACKGROUND_IMAGE_URL = "https://images.unsplash.com/photo-1503951914875-452162b7f342?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
-// Otra opción buena: https://images.unsplash.com/photo-1585747860715-2ba372c4ddb8?q=80&w=2070&auto=format&fit=crop
+
+// 👇 IMPORTANTE: Revisa que este número sea correcto (502...)
+const NUMERO_BARBERO = "50256927575"; 
 
 export default function BookingBarber() {
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
@@ -57,9 +59,24 @@ export default function BookingBarber() {
 
     setSubmitting(true);
     try {
+      // 1. Guardamos en Firebase
       await crearCita({ clienteNombre: name, telefono: phone, fecha: date, hora: selectedSlot });
-      toast.success(`¡Reserva confirmada a las ${selectedSlot}!`, { description: 'Te esperamos en la barbería.', duration: 5000 });
+      
+      toast.success(`¡Reserva confirmada a las ${selectedSlot}!`, { description: 'Abriendo WhatsApp...', duration: 4000 });
       setReservedSlots([...reservedSlots, selectedSlot]);
+
+      // 2. Preparamos mensaje WhatsApp
+      const mensaje = `Hola, soy *${name}*. 👋\nAcabo de reservar mi corte en la web para el día *${date}* a las *${selectedSlot}*.\nMi número es: ${phone}. ¡Nos vemos! 💈`;
+      
+      // 3. Creamos link
+      const urlWhatsApp = `https://wa.me/${NUMERO_BARBERO}?text=${encodeURIComponent(mensaje)}`;
+      
+      // 4. REDIRECCIÓN SEGURA PARA MÓVILES (SOLUCIÓN)
+      // Usamos location.href en lugar de window.open para evitar bloqueo de popups
+      setTimeout(() => {
+        window.location.href = urlWhatsApp;
+      }, 500); // Reducimos el tiempo a medio segundo para que sea más ágil
+
       cerrarModal();
     } catch (error) {
       console.error("Error reservando:", error);
@@ -76,7 +93,6 @@ export default function BookingBarber() {
   };
 
   return (
-    // CAMBIO PRINCIPAL: Quitamos bg-zinc-950 y agregamos estructura para el fondo
     <div className="min-h-dvh relative flex flex-col items-center py-8 px-4 font-sans text-gray-200 overflow-hidden">
       
       {/* 1. CAPA DE IMAGEN DE FONDO */}
@@ -85,11 +101,10 @@ export default function BookingBarber() {
         style={{ backgroundImage: `url('${BACKGROUND_IMAGE_URL}')` }}
       ></div>
 
-      {/* 2. CAPA DE SUPERPOSICIÓN OSCURA (Para que se lea el texto) */}
-      {/* Usamos un degradado para que sea más oscuro arriba y abajo, y un poco de desenfoque */}
+      {/* 2. CAPA DE SUPERPOSICIÓN OSCURA */}
       <div className="absolute inset-0 z-0 bg-linear-to-b from-zinc-950/90 via-zinc-950/85 to-zinc-950/95 backdrop-blur-[2px]"></div>
 
-      {/* 3. CONTENIDO PRINCIPAL (Con z-10 para estar encima del fondo) */}
+      {/* 3. CONTENIDO PRINCIPAL */}
       <div className="relative z-10 w-full flex flex-col items-center">
         
         {/* SECCIÓN DEL LOGO */}
@@ -102,7 +117,7 @@ export default function BookingBarber() {
           <p className="text-zinc-400 uppercase text-xs tracking-[0.3em] font-medium">Reserva tu estilo</p>
         </div>
 
-        {/* TARJETA PRINCIPAL (Ahora con un fondo un poco más translúcido) */}
+        {/* TARJETA PRINCIPAL */}
         <div className="max-w-md w-full bg-zinc-900/80 backdrop-blur-md p-5 rounded-2xl border border-zinc-800/50 shadow-2xl mb-10 animate-in fade-in slide-in-from-bottom-5 duration-700 delay-100">
           
           <div className="mb-6">
@@ -114,7 +129,6 @@ export default function BookingBarber() {
                 onChange={(e) => { setDate(e.target.value); setSelectedSlot(null); }}
                 className="w-full bg-zinc-950/50 border border-zinc-700/50 text-white rounded-xl p-3 outline-none focus:border-red-700/80 focus:ring-1 focus:ring-red-700/50 transition-all text-base appearance-none relative z-10"
               />
-               {/* Icono de calendario decorativo */}
                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="absolute right-3 top-3.5 text-zinc-500 pointer-events-none z-0 opacity-50"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
             </div>
           </div>
@@ -186,7 +200,7 @@ export default function BookingBarber() {
 
       {/* --- MODAL (VENTANA EMERGENTE) --- */}
       {selectedSlot && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-300">
           <div 
             className="w-full max-w-sm bg-zinc-900/95 border border-zinc-700/50 rounded-2xl p-6 shadow-2xl relative animate-in slide-in-from-bottom-10 sm:zoom-in-95 duration-300 backdrop-blur-xl"
             onClick={(e) => e.stopPropagation()}
