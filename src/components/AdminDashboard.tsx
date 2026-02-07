@@ -25,7 +25,7 @@ export default function AdminDashboard() {
   // Estados de Interfaz
   const [fechasExpandidas, setFechasExpandidas] = useState<Record<string, boolean>>({});
   const [busqueda, setBusqueda] = useState('');
-  const [mostrarHistorial, setMostrarHistorial] = useState(false); // <--- NUEVO: Para mostrar/ocultar el pasado
+  const [mostrarHistorial, setMostrarHistorial] = useState(false);
 
   useEffect(() => { cargarCitas(); }, []);
   
@@ -89,11 +89,9 @@ export default function AdminDashboard() {
     return grupos;
   }, {});
 
-  // SEPARACIÓN DE FECHAS (Pasado vs Futuro)
   const hoy = new Date().toISOString().split('T')[0];
-  const todasLasFechas = Object.keys(citasPorFecha).sort(); // Ordenadas cronológicamente
+  const todasLasFechas = Object.keys(citasPorFecha).sort();
 
-  // Si hay búsqueda, mostramos todo junto. Si no, separamos.
   const fechasFuturas = busqueda ? todasLasFechas : todasLasFechas.filter(f => f >= hoy);
   const fechasPasadas = busqueda ? [] : todasLasFechas.filter(f => f < hoy);
 
@@ -138,7 +136,8 @@ export default function AdminDashboard() {
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`text-zinc-500 transition-transform duration-300 ${isExpanded ? 'rotate-0' : '-rotate-90'}`}><path d="m6 9 6 6 6-6"/></svg>
             </button>
 
-            <div className={`grid gap-3 pl-4 border-l-2 border-zinc-900 transition-all duration-300 overflow-hidden ${isExpanded ? 'max-h-500 opacity-100 py-2' : 'max-h-0 opacity-0 py-0'}`}>
+            {/* CORRECCIÓN AQUÍ: Cambiamos max-h-500 por max-h-[3000px] */}
+            <div className={`grid gap-3 pl-4 border-l-2 border-zinc-900 transition-all duration-300 overflow-hidden ${isExpanded ? 'max-h-750 opacity-100 py-2' : 'max-h-0 opacity-0 py-0'}`}>
               {citasPorFecha[fecha].map((cita) => {
                 const isCancelled = cita.estado === 'cancelada';
                 return (
@@ -210,10 +209,10 @@ export default function AdminDashboard() {
               if(e.target.value) {
                 const todasAbiertas = Object.keys(citasPorFecha).reduce((acc, fecha) => ({...acc, [fecha]: true}), {});
                 setFechasExpandidas(todasAbiertas);
-                setMostrarHistorial(true); // Al buscar, expandimos todo
+                setMostrarHistorial(true); 
               } else {
                 setFechasExpandidas({});
-                setMostrarHistorial(false); // Al limpiar, ocultamos historial
+                setMostrarHistorial(false);
               }
             }}
             placeholder="Buscar por celular o nombre..."
@@ -269,10 +268,8 @@ export default function AdminDashboard() {
               </div>
             )}
             
-            {/* 1. SECCIÓN DE CITAS FUTURAS Y HOY (Siempre visibles) */}
             <RenderGrupoFechas fechas={fechasFuturas} />
 
-            {/* 2. SECCIÓN DE HISTORIAL (Oculta por defecto, a menos que busques) */}
             {!busqueda && fechasPasadas.length > 0 && (
               <div className="mt-12 pt-8 border-t border-zinc-900">
                 <button 
@@ -283,13 +280,13 @@ export default function AdminDashboard() {
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`transition-transform duration-300 ${mostrarHistorial ? 'rotate-180' : 'rotate-0'}`}><path d="m6 9 6 6 6-6"/></svg>
                 </button>
 
+                {/* CORRECCIÓN TAMBIÉN AQUÍ: Aumentamos la altura del historial */}
                 <div className={`transition-all duration-500 overflow-hidden ${mostrarHistorial ? 'max-h-1250 opacity-100 mt-6' : 'max-h-0 opacity-0 mt-0'}`}>
                    <RenderGrupoFechas fechas={fechasPasadas} />
                 </div>
               </div>
             )}
 
-            {/* Si estamos buscando, simplemente mostramos el historial mezclado arriba, o lo forzamos aquí si quedó algo suelto */}
             {busqueda && fechasPasadas.length > 0 && (
                <RenderGrupoFechas fechas={fechasPasadas} />
             )}
