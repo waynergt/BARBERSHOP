@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 import logoImg from '../assets/logo.png'; 
 
 const BACKGROUND_IMAGE_URL = "https://images.unsplash.com/photo-1503951914875-452162b7f342?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
-const NUMERO_BARBERO = "50200000000"; 
+const NUMERO_BARBERO = "50256927575"; // Cambia esto por el número real del barbero (con código de país, sin signos ni espacios)
 
 // 👇 INTERRUPTOR DE EMERGENCIA (Cambiar a false cuando ya pueda trabajar)
 const MODO_EMERGENCIA = true; 
@@ -81,7 +81,7 @@ export default function BookingBarber() {
              </div>
              <h2 className="text-xl font-bold text-white mb-3">Aviso Importante</h2>
              <p className="text-zinc-300 text-sm leading-relaxed mb-2">
-               Por motivos de fuerza mayor (salud), la barbería permanecerá <span className="font-bold text-red-400">cerrada hasta nuevo aviso</span>.
+               Por motivos de fuerza mayor (salud), nuestro barbero <span className="font-bold text-red-400">JosStyle30Dc</span> no estara disponible <span className="font-bold text-red-400">hasta nuevo aviso</span>.
              </p>
              <p className="text-zinc-400 text-xs mt-4">Agradecemos tu comprensión. Nos vemos pronto.</p>
           </div>
