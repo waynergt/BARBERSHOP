@@ -6,14 +6,17 @@ import logoImg from '../assets/logo.png';
 const BACKGROUND_IMAGE_URL = "https://images.unsplash.com/photo-1503951914875-452162b7f342?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
 const NUMERO_BARBERO = "50256927575"; 
 
-// 👇 INTERRUPTOR DE EMERGENCIA (Falso = abierto al público, True = mensaje rojo de cerrado)
+// 👇 INTERRUPTOR DE EMERGENCIA (Falso = abierto al público, True = mensaje rojo de cerrado total)
 const MODO_EMERGENCIA = false; 
 
 // 👇 FECHA ÚNICA (Si quieres que SOLO se pueda reservar un día, ponlo aquí. Para normalidad, déjalo vacío: "")
 const FECHA_UNICA = ""; 
 
+// 👇 FECHAS BLOQUEADAS: Pon aquí entre comillas las fechas que el barbero no trabajará (Formato: AAAA-MM-DD)
+// Puedes agregar más separándolas por comas, ej: ["2026-05-15", "2026-12-25"]
+const FECHAS_BLOQUEADAS = ["2026-05-15"];
+
 export default function BookingBarber() {
-  // Iniciamos la fecha con la FECHA_UNICA si existe, si no, con el día de hoy
   const [date, setDate] = useState(FECHA_UNICA || new Date().toISOString().split('T')[0]);
   const [reservedSlots, setReservedSlots] = useState<string[]>([]);
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
@@ -22,8 +25,10 @@ export default function BookingBarber() {
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
+  // Verificamos si la fecha elegida en el calendario está en la lista de bloqueadas
+  const isDiaBloqueado = FECHAS_BLOQUEADAS.includes(date);
+
   // --- LÓGICA DE HORARIOS Y DOMINGOS ---
-  // Averiguamos si la fecha seleccionada es domingo (0 es domingo en JavaScript)
   const diaSemana = new Date(`${date}T12:00:00`).getDay();
   const esDomingo = diaSemana === 0;
 
@@ -40,7 +45,6 @@ export default function BookingBarber() {
     '10:00 PM', '10:30 PM', '11:00 PM', '11:30 PM'
   ];
 
-  // Si es domingo, cortamos la lista para que termine a las 5:00 PM
   if (esDomingo) {
     afternoonSlots = [
       '02:00 PM', '02:30 PM', '03:00 PM', '03:30 PM', 
@@ -50,7 +54,7 @@ export default function BookingBarber() {
 
   const allTimes = [...morningSlots, ...afternoonSlots];
 
-  // LÓGICA: ¿Es horario con recargo nocturno (8:00 PM en adelante)?
+  // LÓGICA: ¿Es horario con recargo nocturno?
   const isHorarioNocturno = (slot: string | null) => {
     if (!slot) return false;
     if (slot.includes('AM') || slot.includes('12:')) return false; 
@@ -61,7 +65,9 @@ export default function BookingBarber() {
   const aplicaRecargo = isHorarioNocturno(selectedSlot);
 
   useEffect(() => {
-    if (MODO_EMERGENCIA) return; 
+    // Si es emergencia o un día bloqueado, no buscamos horarios en internet para ahorrar datos
+    if (MODO_EMERGENCIA || isDiaBloqueado) return; 
+    
     const fetchSlots = async () => {
       setLoading(true);
       setReservedSlots([]);
@@ -75,7 +81,7 @@ export default function BookingBarber() {
       }
     };
     fetchSlots();
-  }, [date]);
+  }, [date, isDiaBloqueado]);
 
   const handleBooking = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -140,32 +146,48 @@ export default function BookingBarber() {
                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="absolute right-3 top-3.5 text-zinc-500 pointer-events-none z-0 opacity-50"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
               </div>
             </div>
-            <div className="flex justify-between items-center mb-4 px-1">
-              <h2 className="text-sm font-bold text-zinc-300 uppercase tracking-wider">Horarios Disponibles</h2>
-              {loading && <span className="text-xs text-red-400/80 animate-pulse font-medium">Cargando...</span>}
-            </div>
-            <div className="grid grid-cols-3 gap-3 mb-4">
-              {allTimes.map((time) => {
-                const isReserved = reservedSlots.includes(time);
-                const esNocturno = isHorarioNocturno(time);
 
-                return (
-                  <button key={time} disabled={isReserved || loading} onClick={() => setSelectedSlot(time)} 
-                  className={`
-                    py-3 px-1 rounded-xl text-sm font-bold transition-all duration-300 border relative touch-manipulation overflow-hidden group 
-                    ${isReserved 
-                      ? 'bg-zinc-950/30 text-zinc-600 border-transparent cursor-not-allowed decoration-zinc-700' 
-                      : esNocturno 
-                        ? 'bg-amber-900/10 text-amber-100/90 border-amber-700/30 hover:bg-amber-800/40 hover:border-amber-500/50 hover:text-white active:scale-95 shadow-[0_0_10px_rgba(245,158,11,0.05)]' 
-                        : 'bg-zinc-800/50 text-gray-200 border-zinc-700/50 hover:bg-zinc-700/80 hover:border-red-900/30 hover:text-white active:scale-95'
-                    }`}>
-                    <span className="relative z-10">{time}</span>
-                    {isReserved && <div className="absolute inset-0 flex items-center justify-center z-0 bg-zinc-950/40"><div className="w-[120%] h-px bg-zinc-700/80 rotate-[-20deg]"></div></div>}
-                    {!isReserved && esNocturno && <div className="absolute top-1 right-1 w-1 h-1 bg-amber-500 rounded-full animate-pulse opacity-50"></div>}
-                  </button>
-                );
-              })}
-            </div>
+            {/* 👇 ESTE ES EL MENSAJE ELEGANTE PARA EL DÍA BLOQUEADO */}
+            {isDiaBloqueado ? (
+              <div className="mt-4 p-6 rounded-xl bg-zinc-950/40 border border-zinc-800 text-center animate-in zoom-in-95 duration-300">
+                 <div className="w-12 h-12 bg-zinc-900 rounded-full flex items-center justify-center mx-auto mb-4 border border-zinc-800 shadow-inner">
+                   <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-zinc-400"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/><line x1="10" x2="14" y1="14" y2="18"/><line x1="14" x2="10" y1="14" y2="18"/></svg>
+                 </div>
+                 <h3 className="text-base font-bold text-white mb-2 tracking-wide">Fecha no disponible</h3>
+                 <p className="text-zinc-400 text-sm leading-relaxed">
+                   Estimado cliente, este día nos encontraremos fuera de servicio. Te invitamos a seleccionar una fecha diferente en el calendario para agendar tu corte. ¡Agradecemos tu preferencia!
+                 </p>
+              </div>
+            ) : (
+              <>
+                <div className="flex justify-between items-center mb-4 px-1">
+                  <h2 className="text-sm font-bold text-zinc-300 uppercase tracking-wider">Horarios Disponibles</h2>
+                  {loading && <span className="text-xs text-red-400/80 animate-pulse font-medium">Cargando...</span>}
+                </div>
+                <div className="grid grid-cols-3 gap-3 mb-4">
+                  {allTimes.map((time) => {
+                    const isReserved = reservedSlots.includes(time);
+                    const esNocturno = isHorarioNocturno(time);
+
+                    return (
+                      <button key={time} disabled={isReserved || loading} onClick={() => setSelectedSlot(time)} 
+                      className={`
+                        py-3 px-1 rounded-xl text-sm font-bold transition-all duration-300 border relative touch-manipulation overflow-hidden group 
+                        ${isReserved 
+                          ? 'bg-zinc-950/30 text-zinc-600 border-transparent cursor-not-allowed decoration-zinc-700' 
+                          : esNocturno 
+                            ? 'bg-amber-900/10 text-amber-100/90 border-amber-700/30 hover:bg-amber-800/40 hover:border-amber-500/50 hover:text-white active:scale-95 shadow-[0_0_10px_rgba(245,158,11,0.05)]' 
+                            : 'bg-zinc-800/50 text-gray-200 border-zinc-700/50 hover:bg-zinc-700/80 hover:border-red-900/30 hover:text-white active:scale-95'
+                        }`}>
+                        <span className="relative z-10">{time}</span>
+                        {isReserved && <div className="absolute inset-0 flex items-center justify-center z-0 bg-zinc-950/40"><div className="w-[120%] h-px bg-zinc-700/80 rotate-[-20deg]"></div></div>}
+                        {!isReserved && esNocturno && <div className="absolute top-1 right-1 w-1 h-1 bg-amber-500 rounded-full animate-pulse opacity-50"></div>}
+                      </button>
+                    );
+                  })}
+                </div>
+              </>
+            )}
           </div>
         )}
 
@@ -213,7 +235,6 @@ export default function BookingBarber() {
             <form onSubmit={handleBooking} className="space-y-5">
               <div className="space-y-2 group">
                 <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider group-focus-within:text-red-500/80 transition-colors ml-1">Tu Nombre</label>
-                {/* 👇 AQUÍ FUE EL CAMBIO DE JUAN PÉREZ A JOSUÉ DEL CID */}
                 <input type="text" placeholder="Ej: Josué del Cid" required autoFocus value={name} onChange={e => setName(e.target.value)} className="w-full bg-zinc-950/50 border border-zinc-700/50 text-white rounded-xl p-4 text-base focus:border-red-600/80 focus:ring-2 focus:ring-red-900/20 outline-none transition-all placeholder:text-zinc-600/50" />
               </div>
               <div className="space-y-2 group">
